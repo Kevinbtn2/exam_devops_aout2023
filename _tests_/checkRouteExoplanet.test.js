@@ -6,7 +6,7 @@ const app = require('../app.js')
 describe('register test', () => {
   it('should be return status code 200', () => {
     request(app)
-      .get('/register')
+      .get('/users/register')
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function (err, res) {
