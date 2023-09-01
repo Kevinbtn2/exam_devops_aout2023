@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 
 const User = require('../models/User.js')
+const Utils = require('../utils/utils.js')
 const bcrypt = require('bcrypt')
 const saltRounds = 10
 
@@ -20,8 +21,9 @@ router.post('/login', (req, res, next) => {
   // User in DB ? -> return the record of the user if found
   const userFound = User.find(req.body.userLogin)
   console.log('User found' + JSON.stringify(userFound))
+
   if (userFound) {
-    if (userFound.active == false) {
+    if (userFound.active === false) {
       req.session.errors = 'Compte désactivé'
       res.redirect('/users')
     } else {
@@ -64,10 +66,17 @@ router.get('/register', (req, res, next) => {
 router.post('/add', (req, res, next) => {
   console.log('USERS ADD')
   // validation
+  // check si le mot de passe est valide
+  if (!Utils.validatePassword(req.body.userPassword)) {
+    console.log('Mot de passe invalide')
+    req.session.errors = 'Mot de passe invalide'
+    res.redirect('/users')
+    return
+  }
   const errors = []
-  if (req.body.userPassword != req.body.userPasswordConfirmation) { errors.push('Les mot de passes ne correspondent pas') }
+  if (req.body.userPassword !== req.body.userPasswordConfirmation) { errors.push('Les mot de passes ne correspondent pas') }
   if (User.find(req.body.userEmail)) { errors.push('Email/Utilisateur déjà présent en DB') }
-  if (errors.length == 0) {
+  if (errors.length === 0) {
     User.save({
       name: req.body.userName,
       firstname: req.body.userFirstname,
