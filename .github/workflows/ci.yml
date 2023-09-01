@@ -1,10 +1,20 @@
 name: Exoplanets CI
 
 on:
-  pull_request:
-    branches: [ main ]
+  push:
+    branches:
+      - main
 
 jobs:
+  check_push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for direct push to main
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          echo "Direct pushes to main branch are not allowed. Please create a pull request."
+          exit 1
+
   check_code:
     runs-on: ubuntu-latest
     steps:
@@ -17,5 +27,3 @@ jobs:
       - run: npm run prettier
       - run: npm test
       - run: npm run build
-
-
